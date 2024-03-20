@@ -12,5 +12,5 @@ Student Info
 
 * Name: Nguyen Cam Tu
 * ID: BI12-462
-* Group ID: *Your Group ID here*
+* Group ID: 7
 
