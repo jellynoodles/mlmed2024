@@ -1,60 +1,83 @@
-\documentclass[conference]{IEEEtran}
-\usepackage{graphicx}
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+\usepackage{multicol}
+\usepackage[margin=1in]{geometry}
+\usepackage{caption}
+
 \title{ECG Heartbeat Classification}
+\author{Nguyen Cam Tu}
+\date{February 2024}
+
 \begin{document}
 \maketitle
-
+\begin{multicols}{2}
 \section{Introduction}
+The heart is a vital organ in the human body, responsible for pumping blood throughout the body to supply necessary oxygen and nutrients. The rhythmic contraction and relaxation of the heart muscle result in what we commonly refer to as the heartbeat. A heartbeat is a complex signal that results from the electrical activity within the heart. It is an essential indicator of cardiovascular health. Regular monitoring of the heartbeat can help detect abnormalities early, potentially preventing severe health issues. In clinical diagnosis, the heartbeat is often analyzed using an electrocardiogram (ECG). ECG signals can reveal important information about the heart's condition, such as arrhythmias, ischemia, and other heart diseases. However, manual analysis of ECG signals can be time-consuming and prone to errors.
 
-Heart
+Machine Learning is a subset of artificial intelligence that uses statistical techniques to give computers the ability to learn from data without being explicitly programmed. It can automatically learn and improve from experience, making it a powerful tool for a wide range of applications. Applying ML techniques to heartbeat classification can automate the process of diagnosing heart conditions from ECG signals. This can significantly reduce the time required for diagnosis and increase the accuracy by minimizing human error.
 
-Heartbeat: what why
+Several studies have been conducted on the application of ML for heartbeat classification. Various ML algorithms, including decision trees, support vector machines, and neural networks, have been used to classify heartbeats into different categories based on the features extracted from ECG signals. Despite the advancements in this field, there is still room for improvement in the accuracy and efficiency of heartbeat classification using ML. This study aims to explore the application of Random Forest Classifier for heartbeat classification and evaluate its performance in terms of accuracy, precision, recall, and F1-score.
 
-Heartbeat in clinical diagnosis: what why
+\section{Data Analysis}
+The MIT-BIH test dataset is a pandas DataFrame with 21892 entries and 188 columns. All columns are of float64 data type. The memory usage of this DataFrame is approximately 31.4 MB. The MIT-BIH train dataset is a pandas DataFrame with 87554 entries and 188 columns. All columns are of float64 data type. The memory usage of this DataFrame is approximately 125.6 MB. 
 
-ML: what why 
+From the figure below, it is observed that there appears an imbalance among the counts of categories. Namely, the Normal (N) class outnumbers the others while the Fuse (F) class has the fewest counts. This may lead to some biases in the prediction of models.
+\includegraphics[width=\linewidth]{trainvisual1.png}
+    \captionof{figure}{Counts of each class in mitbih\_train.csv}
+    \label{fig:train}
+\section{Data Preprocessing}
+To prevent the problem proposed in the previous section, I have upsampled the underrepresented classes up to 20000 samples per each. For the dominant class N, 20000 samples were picked. Afterward, mitbih\_train.csv is now visualized as a balanced dataset.
+\includegraphics[width=\linewidth]{trainvisual2.png}
+    \captionof{figure}{Counts of each class in mitbih\_train.csv after resampling}
+    \label{fig:train resample}
+\section{Modeling}
+The experiment is conducted using a Random Forest Classifier from the \texttt{sklearn} library in Python. The steps are as follows:
 
-ML in heartbeat Classification: what why
+The necessary libraries and modules are imported. This includes \texttt{RandomForestClassifier}, \texttt{train\_test\_split}, \texttt{accuracy\_score}, \texttt{confusion\_matrix}, and \texttt{classification\_report} from \texttt{sklearn}.
 
-What other people do in ML for heartbeat Classification: survey
-
-State problem
-
-\section{Background}
-
-ECG 
-
-CNN 
-
-\section{Method}
-
-CNN architecture
+The features (X) and labels (y) for the training and test sets are defined. The last column of the dataframes \texttt{train\_df} and \texttt{test} is the label. A Random Forest Classifier is created with 100 estimators, a maximum depth of 10, and a random state of 42 for reproducibility. The classifier is fitted on the training set. Predictions are made on the test set. 
 
 \section{Evaluation}
+The model's performance is evaluated using accuracy and a classification report, which includes precision, recall, and F1-score for each class.
 
-Dataset
+\begin{tabular}{c|c c c c}
+\hline
+Class & Precision & Recall & F1-score \\ \hline
+N & 0.98 & 0.95 & 0.97 & 18118 \\
+S & 0.59 & 0.75 & 0.66 & 556 \\ 
+V & 0.93 & 0.89 & 0.91 & 1448 \\ 
+F & 0.20 & 0.85 & 0.33 & 162 \\ 
+Q & 0.95 & 0.95 & 0.95 & 1608 \\ \hline
+\multicolumn{1}{c|}{Accuracy} & & & 0.94 & 21892 \\
+\multicolumn{1}{c|}{Macro avg} & 0.73 & 0.88 & 0.76 & 21892 \\
+\multicolumn{1}{c|}{Weighted avg} & 0.96 & 0.94 & 0. & 21892\\ \hline
+\end{tabular}
+\caption{Classification Report}
+\label{table:classification_report}
 
-Metric
 
-Result
+The confusion matrix displays the results after feeding mitbih\_test.csv into the model. Each row of the matrix represents the instances of an actual class while each column represents the instances of a predicted class.
 
-Discussion
+ 
+\includegraphics[width=\linewidth]{confusion matrix.png}
+    \captionof{figure}{Confusion Matrix of mitbih\_test.csv}
+    \label{fig:confusion matrix}
+
+From the confusion matrix, it can be observed that the model performs well on classifying the 'N' and 'Q' classes with high true positive rates. However, there are some misclassifications. For instance, 495 instances of the 'N' class are misclassified as 'F', and 277 instances of the 'N' class are misclassified as 'S'. 
+
+In the 'F' class, the model correctly identifies 138 instances, but 16 instances are misclassified as 'N'. This indicates that the model might be struggling to distinguish between these classes, possibly due to similarities in their ECG patterns.
+
+The model's performance on the 'S' and 'V' classes is also noteworthy. While it correctly classifies a majority of the 'V' instances, it seems to struggle with the 'S' class, with 132 instances misclassified as 'N'.
+
+These observations suggest that while the model performs well overall, there is room for improvement, particularly in its ability to distinguish between certain classes. Future work could focus on feature engineering or trying different machine learning algorithms to improve the classification performance on these classes.
 
 \section{Conclusion}
 
-What you did, what you did not do, what's wrong
+In this study, we applied a Random Forest Classifier to classify heartbeats from ECG signals. The model showed promising results, with high accuracy for the 'N' and 'Q' classes. However, there were some misclassifications, particularly between the 'N' and 'F' classes and the 'N' and 'S' classes. 
 
-What should be done in the future
+These misclassifications could be due to several factors, including class imbalance, feature selection, model complexity, noise in the data, and insufficient training. Future work could focus on addressing these issues to improve the model's performance. 
 
+Furthermore, other machine learning algorithms could be explored for heartbeat classification. The findings of this study contribute to the growing body of research on the application of machine learning for medical diagnosis, specifically in the field of cardiology. 
 
-
-
-
-
-
-
-
-
-
-
+\end{multicols}
 \end{document}
